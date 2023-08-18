@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { FilterContext } from "@/context/FilterContext";
 import { useContext } from "react";
+import { FilterContext } from "@/context/FilterContext";
 
 const Session = ({ title, room }) => {
   return (
@@ -10,14 +10,24 @@ const Session = ({ title, room }) => {
   );
 };
 
-const Sessions = ({ sessions, showSession }) => {
+const Sessions = ({ sessions }) => {
+  const { eventYear } = useContext(FilterContext);
+  console.log("Sessions from speaker is : ", sessions);
   return (
     <>
-      {showSession && (
-        <div className="sessionBox card h-250">
-          <Session {...sessions[0]} />
-        </div>
-      )}
+      <div className="sessionBox card h-250">
+        {sessions
+          .filter((session) => {
+            return session.eventYear === eventYear;
+          })
+          .map((session) => {
+            return (
+              <div className="session w-full" key={session.id}>
+                <Session {...session} />
+              </div>
+            );
+          })}
+      </div>
     </>
   );
 };
@@ -37,10 +47,10 @@ const SpeakerImage = ({ first, last, id }) => {
   );
 };
 
-const SpeakerFav = ({ favourite, id, handleChange}) => {
+const SpeakerFav = ({ favourite, id, handleChange }) => {
   return (
     <div className="action pb-1">
-      <span onClick={()=> handleChange({id})}>
+      <span onClick={() => handleChange({ id })}>
         <i
           className={`fa ${
             favourite === true ? "fa-star orange" : "fa-star-o orange"
@@ -54,7 +64,7 @@ const SpeakerFav = ({ favourite, id, handleChange}) => {
 };
 
 const SpeakerBio = ({ details, handleChange }) => {
-  const {id, first, last, bio, twitterHandle, favorite, company } = details;
+  const { id, first, last, bio, twitterHandle, favorite, company } = details;
   return (
     <div className="speaker-info my-3">
       <div className="d-flex justify-content-between mb-1">
@@ -62,7 +72,7 @@ const SpeakerBio = ({ details, handleChange }) => {
           {first} {last}
         </h3>
       </div>
-      <SpeakerFav favourite={favorite} id={id} handleChange={handleChange}/>
+      <SpeakerFav favourite={favorite} id={id} handleChange={handleChange} />
       <div>
         <p className="card-description mt-2">{bio}</p>
         <div className="social d-flex flex-row mt-4">
@@ -81,13 +91,13 @@ const SpeakerBio = ({ details, handleChange }) => {
 };
 
 const Speaker = ({ speaker, handleChange }) => {
-  const {showSession}= useContext(FilterContext)
+  const { showSession } = useContext(FilterContext);
   return (
     <div className="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-sm-12 col-xs-12">
       <div className="card card-height p-4 mt-4">
         <SpeakerImage {...speaker} />
-        <SpeakerBio details={speaker} handleChange={handleChange}/>
-        <Sessions sessions={speaker.sessions} showSession={showSession} />
+        <SpeakerBio details={speaker} handleChange={handleChange} />
+        {showSession && <Sessions sessions={speaker.sessions} />}
       </div>
     </div>
   );

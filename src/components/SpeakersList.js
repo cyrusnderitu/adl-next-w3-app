@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { data } from "../../SpeakerData";
 import Speaker from "./Speaker";
+import { FilterContext } from "@/context/FilterContext";
 
 const SpeakersList = () => {
   const [speakerData, setSpeakerData] = useState([]);
@@ -8,22 +9,25 @@ const SpeakersList = () => {
   const [hasErrored, setHasErrored] = useState(false);
   const [error, setError] = useState(false);
 
+  const { eventYear, searchQuery } = useContext(FilterContext);
+
+
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  useEffect(()=>{
-    const delayFunc = async()=>{
+  useEffect(() => {
+    const delayFunc = async () => {
       try {
         await delay(1000);
         setIsLoading(false);
         setSpeakerData(data);
       } catch (error) {
         setIsLoading(true);
-        setHasErrored(true)
+        setHasErrored(true);
         setError(error);
       }
-    }
-    delayFunc()
-  }, [])
+    };
+    delayFunc();
+  }, []);
 
   const handleFavChange = (id) => {
     const SpeakerFav = speakerData.find((item) => item.id === id);
@@ -39,20 +43,32 @@ const SpeakersList = () => {
     setSpeakerData(SpeakerDataUpdate);
   };
 
-  if (hasErrored == true){
-    return(
+  if (hasErrored == true) {
+    return (
       <div className="text-danger">
         Error: <b>loading the Speaker Data Failed {error}</b>
       </div>
-    )
+    );
   }
-  if(isLoading) return <div >Loading.....</div>
+  if (isLoading) return <div>Loading.....</div>;
 
   return (
     <div className="container speakers-list">
       <div className="row">
-        {speakerData &&
-          speakerData.map((speaker) => {
+        {speakerData
+          .filter((speaker) => {
+            console.log(speaker.first.toLowerCase())
+            return (
+              speaker.first.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              speaker.last.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+          })
+          .filter((speaker) => {
+            return speaker.sessions.find((session) => {
+              return session.eventYear === eventYear;
+            });
+          })
+          .map((speaker) => {
             return (
               <Speaker
                 key={speaker.id}

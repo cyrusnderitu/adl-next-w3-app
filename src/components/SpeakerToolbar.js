@@ -70,6 +70,7 @@ const SpeakerToolbar = () => {
                   value={eventYear}
                   onChange={({ currentTarget }) => {
                     setEventYear(currentTarget.value);
+                    console.log("The vent YEar choosen by select is: ", eventYear)
                   }}>
                     {EVENT_YEARS.map((year)=>{
                       return(

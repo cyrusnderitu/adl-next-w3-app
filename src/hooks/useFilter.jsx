@@ -1,9 +1,9 @@
 import {useState} from 'react'
 
-const useFilter = ({sharedSession}) => {
+const useFilter = ({sharedSession = true , sharedYear = "2008"}) => {
     const [showSession, setShowSession] = useState(sharedSession)
+    const [eventYear, setEventYear] = useState(sharedYear)
     const [searchQuery, setSearchQuery] = useState("")
-    const [eventYear, setEventYear] = useState()
 
     const EVENT_YEARS = [
       "2008",
